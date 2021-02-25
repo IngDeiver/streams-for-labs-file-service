@@ -71,12 +71,24 @@ class FileController {
    * @return {JSON} - A list of Files
    * @memberof FileController
    */
-  public static async getById(req: Request, res: Response, next: NextFunction) {
+  public static async download(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const File: IFile | null = await FileService.getById(id);
-      if (!File) throw new HttpException(404, 'File not found');
-      res.json(File);
+      const file: IFile | null = await FileService.getById(id);
+      if (!file) throw new HttpException(404, 'File not found');
+
+      const host = req.protocol + '://' + req.get('host')
+      const location = __dirname + "/../../public" + file.path.replace(host, "")
+      console.log("Location:", location);
+      
+      res.download(location, file.name, err => {
+        if (err) {
+          throw new HttpException(500, err.message);
+        } else {
+          console.log(`File ${file.name} downloaded`);
+          
+        }
+      })
     } catch (error) {
       return next(new HttpException(error.status || 500, error.message));
     }

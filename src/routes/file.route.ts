@@ -40,6 +40,15 @@ class FileRouter implements IRoute {
         .create(req, res, next),
     );
 
+    // Get File
+    this.router.get(
+      this.pathIdParam,
+      isDefinedParamMiddleware(),
+      (req: Request, res: Response, next: NextFunction) => FileControler
+        .download(req, res, next),
+    );
+
+
     // Update File
     this.router.put(
       this.pathIdParam,
