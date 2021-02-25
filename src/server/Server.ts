@@ -79,6 +79,7 @@ class Server {
       this.app.use(cors({ origin: true, credentials: true }));
     }
 
+    this.app.use(express.urlencoded({extended: false}));
     this.app.use(express.json());
     this.app.use(router);
   }
