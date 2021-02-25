@@ -19,6 +19,7 @@ class FileRouter implements IRoute {
   public router = Router();
 
   public pathIdParam = '/:id';
+  public pathAuthorParam = '/:author'
 
   constructor() {
     this.createRoutes();
@@ -42,7 +43,7 @@ class FileRouter implements IRoute {
 
     // Get File
     this.router.get(
-      this.pathIdParam,
+      `${this.pathIdParam}${this.pathAuthorParam}`,
       isDefinedParamMiddleware(),
       (req: Request, res: Response, next: NextFunction) => FileControler
         .download(req, res, next),

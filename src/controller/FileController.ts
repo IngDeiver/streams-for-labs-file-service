@@ -71,11 +71,13 @@ class FileController {
    * @return {JSON} - A list of Files
    * @memberof FileController
    */
-  public static async download(req: Request, res: Response, next: NextFunction) {
+  public static async download(req: any, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const { id, author } = req.params;
       const file: IFile | null = await FileService.getById(id);
+
       if (!file) throw new HttpException(404, 'File not found');
+      if( author != file.author) throw new HttpException(403, 'Forbidden: The file is not his authorship.');
 
       const host = req.protocol + '://' + req.get('host')
       const location = __dirname + "/../../public" + file.path.replace(host, "")
