@@ -113,5 +113,15 @@ class FileRepository implements ICrud<IFile, string> {
   async getSharedFiles(user: string): Promise<Array<IFile>> {
     return File.find({ shared_users: user }).populate('author');
   }
+
+   /**
+   *
+   *
+   * @return {Promise<Array<IFile>>} List of shared files
+   * @memberof FileRepository
+   */
+  async getFiles(author: string): Promise<Array<IFile>> {
+    return File.find({ author });
+  }
 }
 export default new FileRepository();

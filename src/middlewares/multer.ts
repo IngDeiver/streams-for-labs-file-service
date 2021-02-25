@@ -9,8 +9,9 @@ const storage = multer.diskStorage({
       else if(mimetype.includes("video")) destination = "videos"
       cb(null, `public/${destination}`)
     },
-    filename: function (req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now()  + '-' + file.originalname)
+    filename:  function (req, file, cb) {
+      const name = file.originalname.replace(/[^.,a-zA-Z]/g, "")
+      cb(null, Date.now()  + '-' + name)
     }
   })
 

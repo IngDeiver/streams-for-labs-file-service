@@ -93,6 +93,10 @@ class FileService implements ICrud<IFile, string> {
         (error, task: IFile| null) => resolve(task));
     });
   }
+
+  async getFiles(author: string): Promise<Array<IFile>> {
+    return FileRepository.getFiles(author);
+  }
 }
 
 export default new FileService();

@@ -26,16 +26,10 @@ class FileRouter implements IRoute {
 
   createRoutes(): void {
 
-    // get File by Id
-    this.router.get(
-      this.pathIdParam,
-      isDefinedParamMiddleware(),
-      (req: Request, res: Response, next: NextFunction) => FileControler
-        .getById(req, res, next),
-    );
-
     // list Files
-    this.router.get('/', (req: Request, res: Response, next: NextFunction) => FileControler
+    this.router.get('/', 
+    (req, res, next) => getAuthUserMiddleware(req, next),
+    (req: Request, res: Response, next: NextFunction) => FileControler
       .list(req, res, next));
 
     // Save File

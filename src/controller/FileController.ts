@@ -25,7 +25,8 @@ class FileController {
    */
   public static async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const Files: Array<IFile> = await FileService.list();
+      const author = "6021555f4f47de4e3be25cc6"
+      const Files: Array<IFile> = await FileService.getFiles(author);
       res.json(Files);
     } catch (error) {
       return next(new HttpException(error.status || 500, error.message));
@@ -45,14 +46,13 @@ class FileController {
   public static async create(req: any, res: Response, next: NextFunction) {
     try {
       let file = req.file
-      //console.log("Body:" + req.body);
       
       console.log("File received in storage service: ", req.file);
       console.log("User received in storage service:" , req.body.user);
       
-
-      const fileInstance:IFile = new File({ name: file.fieldname, path: file.path, weight: file.size,
-        upload_at: new Date(), author: req.user, shared_users:[]});
+      const fullUrl = req.protocol + '://' + req.get('host')
+      const fileInstance:IFile = new File({ name: file.originalname, 
+        path: fullUrl+ file.path.replace("public","") ,weight: file.size, upload_at: new Date(), author: "6021555f4f47de4e3be25cc6", shared_users:[]});
 
       const fileSaved: IFile = await FileService.create(fileInstance);
       res.json(fileSaved);
