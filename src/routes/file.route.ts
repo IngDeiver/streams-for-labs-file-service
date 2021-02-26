@@ -57,8 +57,8 @@ class FileRouter implements IRoute {
 
     // Remove File
     this.router.delete(
-      `${this.pathIdParam}${this.pathAuthorParam}`,
-      isDefinedParamMiddleware(),
+      `${this.pathAuthorParam}`,
+      isDefinedParamMiddleware('params', 'author'),
       (req: Request, res: Response, next: NextFunction) => FileControler
         .removeById(req, res, next),
     );

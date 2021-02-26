@@ -6,6 +6,9 @@ import { File, Photo, Video } from '../models';
 import { HttpException } from '../exceptions';
 import { FileService, PhotoService, VideoService } from '../services';
 import fs from 'fs'
+import path from 'path'
+
+
 /**
  *
  * The File controller
@@ -127,17 +130,35 @@ class FileController {
    */
   public static async removeById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id, author } = req.params;
-      const file: IFile | null = await FileService.removeById(id);
-
-      if (!file) throw new HttpException(404, 'File not found');
-      if( author != file.author) throw new HttpException(403, 'Forbidden: The file is not his authorship.');
+      const {author } = req.params;
+      const filesToRemove = req.body.files
+      console.log("Files received: ", filesToRemove);
       
-      const host = req.protocol + '://' + req.get('host')
-      const location = __dirname + "/../../public" + file.path.replace(host, "")
-      fs.unlinkSync(location)
-      console.log(`File ${file.name} deleted`);
-      res.json(file);
+      // If have one file to remove
+      if(filesToRemove.length === 1){
+        const id = filesToRemove[0]
+        const file: IFile | null = await FileService.removeById(id);
+        if (!file) throw new HttpException(404, 'File not found');
+        if( author != file.author) throw new HttpException(403, 'Forbidden: The file is not his authorship.');
+      
+        const host = req.protocol + '://' + req.get('host')
+        const location = __dirname + "/../../public" + file.path.replace(host, "")
+        fs.unlinkSync(path.resolve(location))
+        console.log(`File ${file.name} deleted`);
+      }else { // If have multiple files to remove
+        filesToRemove.forEach(async (fileId: string) => {
+          const file: IFile | null = await FileService.removeById(fileId);
+          if (!file) throw new HttpException(404, 'File not found');
+          if( author != file.author) throw new HttpException(403, 'Forbidden: The file is not his authorship.');
+        
+          const host = req.protocol + '://' + req.get('host')
+          const location = __dirname + "/../../public" + file.path.replace(host, "")
+          fs.unlinkSync(path.resolve(location))
+          console.log(`File ${file.name} deleted`);
+        });
+      }
+      
+      res.sendStatus(200)
     } catch (error) {
       return next(new HttpException(error.status || 500, error.message));
     }
