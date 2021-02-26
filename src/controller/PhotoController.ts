@@ -71,7 +71,8 @@ class PhotoController {
     }
   }
 
-  /**
+  
+    /**
    *
    * Remove Photo by id
    * @static
@@ -83,21 +84,38 @@ class PhotoController {
    */
   public static async removeById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id, author } = req.params;
-      const photo: IPhoto | null = await PhotoService.removeById(id);
-
-      if (!photo) throw new HttpException(404, 'Photo not found');
-      if( author != photo.author) throw new HttpException(403, 'Forbidden: The Photo is not his authorship.');
+      const {author } = req.params;
+      const photosToRemove = req.body.files
+      console.log("Photos received: ", photosToRemove);
       
-      const host = req.protocol + '://' + req.get('host')
-      const location = __dirname + "/../../public" + photo.path.replace(host, "")
-      fs.unlinkSync(location)
-      console.log(`Photo ${photo.name} deleted`);
-      res.json(photo);
+      // If have one Photo to remove
+      if(photosToRemove.length === 1){
+        const id = photosToRemove[0]
+        const photo: IPhoto | null = await PhotoService.removeById(id);
+        if (!photo) throw new HttpException(404, 'Photo not found');
+        if( author != photo.author) throw new HttpException(403, 'Forbidden: The Photo is not his authorship.');
+      
+        const host = req.protocol + '://' + req.get('host')
+        const location = __dirname + "/../../public" + photo.path.replace(host, "")
+        fs.unlinkSync(path.resolve(location))
+        console.log(`Photo ${photo.name} deleted`);
+      }else { // If have multiple Photos to remove
+        photosToRemove.forEach(async (PhotoId: string) => {
+          const Photo: IPhoto | null = await PhotoService.removeById(PhotoId);
+          if (!Photo) throw new HttpException(404, 'Photo not found');
+          if( author != Photo.author) throw new HttpException(403, 'Forbidden: The Photo is not his authorship.');
+        
+          const host = req.protocol + '://' + req.get('host')
+          const location = __dirname + "/../../public" + Photo.path.replace(host, "")
+          fs.unlinkSync(path.resolve(location))
+          console.log(`Photo ${Photo.name} deleted`);
+        });
+      }
+      
+      res.sendStatus(200)
     } catch (error) {
       return next(new HttpException(error.status || 500, error.message));
     }
   }
-
 }
 export default PhotoController;
