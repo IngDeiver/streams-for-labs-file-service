@@ -93,6 +93,10 @@ class PhotoService implements ICrud<IPhoto, string> {
         (error, task: IPhoto| null) => resolve(task));
     });
   }
+
+  async getPhotos(author: string): Promise<Array<IPhoto>> {
+    return PhotoRepository.getPhotos(author);
+  }
 }
 
 export default new PhotoService();

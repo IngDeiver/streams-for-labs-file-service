@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
 import { NextFunction, Response, Request } from 'express';
-import { IFile } from '../interfaces';
-import { File } from '../models';
+import { IFile,IPhoto, IVideo} from '../interfaces';
+import { File, Photo, Video } from '../models';
 import { HttpException } from '../exceptions';
-import { FileService } from '../services';
+import { FileService, PhotoService, VideoService } from '../services';
 
 /**
  *
@@ -51,11 +51,31 @@ class FileController {
       console.log("User received in storage service:" , req.body.user);
       
       const fullUrl = req.protocol + '://' + req.get('host')
-      const fileInstance:IFile = new File({ name: file.originalname, 
-        path: fullUrl+ file.path.replace("public","") ,weight: file.size, upload_at: new Date(), author: "6021555f4f47de4e3be25cc6", shared_users:[]});
+      const path = fullUrl+ file.path.replace("public","")
+      const weight = file.size
+      const upload_at = new Date()
+      const author = "6021555f4f47de4e3be25cc6" // mientras se ajusta la gateway
+      const name = file.originalname
 
-      const fileSaved: IFile = await FileService.create(fileInstance);
-      res.json(fileSaved);
+      if(file.mimetype.includes("image")){ // Save image
+        const photoInstance:IPhoto = new Photo({name, path, weight, upload_at, author, shared_users:[]});
+        const photoSaved: IPhoto = await PhotoService.create(photoInstance);
+        console.log("Image saved");
+        res.json(photoSaved)
+
+      }else if(file.mimetype.includes("video")){// Save video
+        const videoInstance:IVideo = new Video({name, path, weight, upload_at, author, shared_users:[]});
+        const videoSaved: IVideo = await VideoService.create(videoInstance);
+        console.log("Video saved");
+        res.json(videoSaved);
+
+      }else {// Save file
+        const fileInstance:IFile = new File({name, path, weight, upload_at, author, shared_users:[]});
+        const fileSaved: IFile = await FileService.create(fileInstance);
+        console.log("File saved");
+        res.json(fileSaved);
+      }
+
     } catch (error) {
       return next(new HttpException(error.status || 500, error.message));
     }
