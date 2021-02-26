@@ -40,6 +40,13 @@ import {
           .download(req, res, next),
       );
 
+       // Remove File
+    this.router.delete(
+      `${this.pathIdParam}${this.pathAuthorParam}`,
+      isDefinedParamMiddleware(),
+      (req: Request, res: Response, next: NextFunction) => PhotoControler
+        .removeById(req, res, next),
+    );
     }
   }
   export default new PhotoRouter().router;

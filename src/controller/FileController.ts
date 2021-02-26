@@ -5,7 +5,7 @@ import { IFile,IPhoto, IVideo} from '../interfaces';
 import { File, Photo, Video } from '../models';
 import { HttpException } from '../exceptions';
 import { FileService, PhotoService, VideoService } from '../services';
-
+import fs from 'fs'
 /**
  *
  * The File controller
@@ -25,7 +25,7 @@ class FileController {
    */
   public static async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const author = "6021555f4f47de4e3be25cc6"
+      const author = req.params.author
       const Files: Array<IFile> = await FileService.getFiles(author);
       res.json(Files);
     } catch (error) {
@@ -48,13 +48,12 @@ class FileController {
       let file = req.file
       
       console.log("File received in storage service: ", req.file);
-      console.log("User received in storage service:" , req.body.user);
       
+      const author = req.params.author
       const fullUrl = req.protocol + '://' + req.get('host')
       const path = fullUrl+ file.path.replace("public","")
       const weight = file.size
       const upload_at = new Date()
-      const author = "6021555f4f47de4e3be25cc6" // mientras se ajusta la gateway
       const name = file.originalname
 
       if(file.mimetype.includes("image")){ // Save image
@@ -128,38 +127,46 @@ class FileController {
    */
   public static async removeById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
-      const File: IFile | null = await FileService
-        .removeById(id);
-      if (!File) throw new HttpException(404, 'File not found');
-      res.json(File);
+      const { id, author } = req.params;
+      const file: IFile | null = await FileService.removeById(id);
+
+      if (!file) throw new HttpException(404, 'File not found');
+      if( author != file.author) throw new HttpException(403, 'Forbidden: The file is not his authorship.');
+      
+      const host = req.protocol + '://' + req.get('host')
+      const location = __dirname + "/../../public" + file.path.replace(host, "")
+      fs.unlinkSync(location)
+      console.log(`File ${file.name} deleted`);
+      res.json(file);
     } catch (error) {
       return next(new HttpException(error.status || 500, error.message));
     }
   }
 
-  /**
-   *
-   * Update File by id
-   * @static
-   * @param {Request} req - The request
-   * @param {Response} res - The response
-   * @param {NextFunction} next - The next middleware in queue
-   * @return {JSON} - A list of FileS
-   * @memberof FileController
-   */
-  public static async updateById(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { id } = req.params;
-      const { Filename, email, password } = req.body;
-      const FileUpdated: IFile | null = await FileService
-        .updateById(id, { Filename, email, password});
-      if (!FileUpdated) throw new HttpException(404, 'File not found');
-      res.json(FileUpdated);
-    } catch (error) {
-      return next(new HttpException(error.status || 500, error.message));
-    }
-  }
+  // /**
+  //  *
+  //  * Update File by id
+  //  * @static
+  //  * @param {Request} req - The request
+  //  * @param {Response} res - The response
+  //  * @param {NextFunction} next - The next middleware in queue
+  //  * @return {JSON} - A list of FileS
+  //  * @memberof FileController
+  //  */
+  // public static async updateById(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const { id, author } = req.params;
+  //     const { Filename, email, password } = req.body;
+  //     const fileUpdated: IFile | null = await FileService
+  //       .updateById(id, { Filename, email, password});
+
+  //     if (!fileUpdated) throw new HttpException(404, 'File not found');
+  //     if( author != fileUpdated.author) throw new HttpException(403, 'Forbidden: The file is not his authorship.');
+  //     res.json(fileUpdated);
+  //   } catch (error) {
+  //     return next(new HttpException(error.status || 500, error.message));
+  //   }
+  // }
 
 }
 export default FileController;

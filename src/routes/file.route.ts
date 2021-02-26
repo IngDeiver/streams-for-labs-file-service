@@ -3,10 +3,8 @@ import {
 } from 'express';
 import { IRoute } from '../interfaces';
 import { FileControler } from '../controller';
-import { isDefinedParamMiddleware, validationMiddleware } from '../middlewares';
-import { FileDTO } from '../dtos';
+import { isDefinedParamMiddleware } from '../middlewares';
 import upload from '../middlewares/multer'
-import getAuthUserMiddleware from '../middlewares/getAuthUser'
 
 /**
  *
@@ -28,15 +26,13 @@ class FileRouter implements IRoute {
   createRoutes(): void {
 
     // list Files
-    this.router.get(`${this.pathAuthorParam}`, 
-    (req, res, next) => getAuthUserMiddleware(req, next),
+    this.router.get(`${this.pathAuthorParam}`,
     (req: Request, res: Response, next: NextFunction) => FileControler
       .list(req, res, next));
 
     // Save File
-    this.router.post('/',
+    this.router.post(`${this.pathAuthorParam}`,
       upload.single('file'),
-      (req, res, next) => getAuthUserMiddleware(req, next),
       (req: Request, res: Response, next: NextFunction) => FileControler
         .create(req, res, next),
     );
@@ -50,18 +46,18 @@ class FileRouter implements IRoute {
     );
 
 
-    // Update File
-    this.router.put(
-      this.pathIdParam,
-      isDefinedParamMiddleware(),
-      validationMiddleware(FileDTO, true),
-      (req: Request, res: Response, next: NextFunction) => FileControler
-        .updateById(req, res, next),
-    );
+    // // Update File
+    // this.router.put(
+    //   this.pathIdParam,
+    //   isDefinedParamMiddleware(),
+    //   validationMiddleware(FileDTO, true),
+    //   (req: Request, res: Response, next: NextFunction) => FileControler
+    //     .updateById(req, res, next),
+    // );
 
     // Remove File
     this.router.delete(
-      this.pathIdParam,
+      `${this.pathIdParam}${this.pathAuthorParam}`,
       isDefinedParamMiddleware(),
       (req: Request, res: Response, next: NextFunction) => FileControler
         .removeById(req, res, next),
