@@ -3,7 +3,7 @@ import { IPhoto } from '../interfaces';
 
 const PhotoSchema: Schema<IPhoto> = new Schema({
     name: {type: String, required: true},
-    path: {type: String, required: true},
+    path: {type: String, required: true,  unique: true},
     weight: {type: Number, required: true},
     upload_at: {type: Date, required: true},
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true},

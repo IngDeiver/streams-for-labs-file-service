@@ -1,17 +1,19 @@
 import multer from 'multer'
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: function (req:any, file, cb) {
       const mimetype = file.mimetype;
-      let destination = "files" 
+      let folder = "files"
+      //const USERNAME = req.user.username
+      const USERNAME = 'Deiver Guerra Carrascal'
+      const USER_FOLDER = `/home/streams-for-lab.co/${USERNAME?.toLowerCase().trim().replace(/ /g,'-')}`
       
-      if(mimetype.includes("image")) destination = "photos"
-      else if(mimetype.includes("video")) destination = "videos"
-      cb(null, `public/${destination}`)
+      if(mimetype.includes("image")) folder = "photos"
+      else if(mimetype.includes("video")) folder = "videos"
+      cb(null, `${USER_FOLDER}/${folder}`)
     },
     filename:  function (req, file, cb) {
-      const name = file.originalname.replace(/[^.,a-zA-Z]/g, "")
-      cb(null, Date.now()  + '-' + name)
+      cb(null,file.originalname)
     }
   })
 
