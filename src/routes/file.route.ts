@@ -25,13 +25,30 @@ class FileRouter implements IRoute {
 
   createRoutes(): void {
 
+     // Get storage used by user
+     this.router.get(
+      `/storage${this.pathAuthorParam}`,
+      isDefinedParamMiddleware('params', 'author'),
+      (req: Request, res: Response, next: NextFunction) => FileControler.getStorageByUser(req, res, next),
+    );
+    
+    
+     // Get max storage
+     this.router.get(
+      `/max-storage${this.pathAuthorParam}`,
+      isDefinedParamMiddleware('params', 'author'),
+      (req: Request, res: Response, next: NextFunction) => FileControler.getMaxStorage(req, res, next),
+    );
+
     // list Files
     this.router.get(`${this.pathAuthorParam}`,
+    isDefinedParamMiddleware('params', 'author'),
     (req: Request, res: Response, next: NextFunction) => FileControler
       .list(req, res, next));
 
     // Save File
     this.router.post(this.pathAuthorParam,
+      isDefinedParamMiddleware('params', 'author'),
     (req, res, next) => getAuthUserMiddleware(req, next),
       upload.single('file'),
       (req: Request, res: Response, next: NextFunction) => FileControler
@@ -42,10 +59,12 @@ class FileRouter implements IRoute {
     this.router.get(
       `${this.pathIdParam}${this.pathAuthorParam}`,
       isDefinedParamMiddleware(),
+      isDefinedParamMiddleware('params', 'author'),
       (req: Request, res: Response, next: NextFunction) => FileControler
         .download(req, res, next),
     );
 
+   
     // Remove File
     this.router.delete(
       `${this.pathAuthorParam}`,

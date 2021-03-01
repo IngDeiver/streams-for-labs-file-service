@@ -4,6 +4,7 @@ import IRoute from './IRoute';
 import IFile from './IFile';
 import IPhoto from './IPhoto';
 import IVideo from './IVideo';
+import IConfig from './IConfig';
 
 export {
   // eslint-disable-next-line import/prefer-default-export
@@ -12,5 +13,6 @@ export {
   IRoute,
   IFile,
   IVideo,
-  IPhoto
+  IPhoto,
+  IConfig
 };

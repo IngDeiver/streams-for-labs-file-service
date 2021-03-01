@@ -113,5 +113,15 @@ class VideoRepository implements ICrud<IVideo, string> {
   async getSharedVideos(user: string): Promise<Array<IVideo>> {
     return Video.find({ shared_users: user }).populate('author');
   }
+
+  /**
+   *
+   *
+   * @return {Promise<Array<IPhoto>>} List videos
+   * @memberof VideoRepository
+   */
+  async getVideos(author: string): Promise<Array<IVideo>> {
+    return Video.find({ author });
+  }
 }
 export default new VideoRepository();

@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
 import { NextFunction, Response, Request } from 'express';
-import { IFile,IPhoto, IVideo} from '../interfaces';
-import { File, Photo, Video } from '../models';
+import { IConfig, IFile,IPhoto, IVideo} from '../interfaces';
+import { Config, File, Photo, Video } from '../models';
 import { HttpException } from '../exceptions';
 import { FileService, PhotoService, VideoService } from '../services';
 import fs from 'fs'
@@ -36,6 +36,61 @@ class FileController {
       return next(new HttpException(error.status || 500, error.message));
     }
   }
+
+  
+    /**
+   *
+   * get storage
+   * @static
+   * @param {Request} req - The request
+   * @param {Response} res - The response
+   * @param {NextFunction} next - The next middleware in queue
+   * @return {JSON} - Get storage
+   * @memberof FileController
+   */
+  public static async getStorageByUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const author = req.params.author
+      const files: Array<IFile> = await FileService.getFiles(author);
+      const photos: Array<IPhoto> = await PhotoService.getPhotos(author);
+      const videos: Array<IVideo> = await VideoService.getVideos(author);
+
+      let storageUsed = 0
+      const weightFiles = files.map(file => file.weight)
+      const weightVideos = videos.map(video => video.weight)
+      const weightPhotos = photos.map(photos => photos.weight)
+
+      if(weightFiles.length > 0) storageUsed += weightFiles.reduce((a, b) => a + b) 
+      if(weightVideos.length > 0) storageUsed += weightVideos.reduce((a, b) => a + b) 
+      if(weightPhotos.length > 0) storageUsed += weightPhotos.reduce((a, b) => a + b) 
+
+
+      res.json({ storageUsed });
+    } catch (error) {
+      return next(new HttpException(error.status || 500, error.message));
+    }
+  }
+
+      /**
+   *
+   * get max storage
+   * @static
+   * @param {Request} req - The request
+   * @param {Response} res - The response
+   * @param {NextFunction} next - The next middleware in queue
+   * @return {JSON} - Get max storage
+   * @memberof FileController
+   */
+  public static async getMaxStorage(req: Request, res: Response, next: NextFunction) {
+    try {
+      const configs: Array<IConfig> = await Config.find({});
+      res.json({maxStoraged: configs[0].max});
+    } catch (error) {
+      return next(new HttpException(error.status || 500, error.message));
+    }
+  }
+
+  
 
   /**
    *

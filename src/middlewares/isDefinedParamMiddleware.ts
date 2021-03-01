@@ -26,7 +26,7 @@ const isDefinedParam = (
     isMongoId = ObjectId.isValid(paramValue);
     if (!exist || !isMongoId) {
       return next(
-        new HttpException(400, `${value} is required and shoul be ObjectId`),
+        new HttpException(400, `${paramValue} is required and shoul be ObjectId`),
       );
     }
   } else if (!exist) return next(new HttpException(400, `${value} is required`));
