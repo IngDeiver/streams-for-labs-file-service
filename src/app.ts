@@ -14,7 +14,9 @@ Database.connect();
 if (process.env.NODE_ENV !== 'test') {
   server.listen(() => {
     logger.info(`🚀 File service listening on the port ${PORT}`)
-    logger.info(`Only accept request from ${process.env.ORIGIN_URL}`)
+    if(process.env.NODE_ENV === "production"){
+      logger.info(`Only accept request from ${process.env.ALLOW_ORIGIN_URL}`)
+    }
   });
 }
 export default server;
