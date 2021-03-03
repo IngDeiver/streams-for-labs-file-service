@@ -8,6 +8,7 @@ import { FileService, PhotoService, VideoService } from '../services';
 import fs from 'fs'
 import path from 'path'
 import { encryptAndSaveFile, decryptFile } from '../utils/encrypt'
+import stream from 'stream'
 
 /**
  *
@@ -178,15 +179,23 @@ class FileController {
 
       const location = file.path
       console.log("Location:", location);
-      
-      res.download(location, file.name, err => {
-        if (err) {
-          throw new HttpException(500, err.message);
-        } else {
-          console.log(`File ${file.name} downloaded`);
+
+      const fileDecryped = await decryptFile(location)
+      res.writeHead(200, {
+          "Content-disposition": "attachment; filename=" + file.name,
+          "Content-Type": "application/octet-stream",
+          "Content-Length": fileDecryped.length
+      });
+      res.end(fileDecryped);
+
+      // res.download(location, file.name, err => {
+      //   if (err) {
+      //     throw new HttpException(500, err.message);
+      //   } else {
+      //     console.log(`File ${file.name} downloaded`);
           
-        }
-      })
+      //   }
+      // })
     } catch (error) {
       return next(new HttpException(error.status || 500, error.message));
     }
