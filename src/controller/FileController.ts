@@ -8,7 +8,6 @@ import { FileService, PhotoService, VideoService } from '../services';
 import fs from 'fs'
 import path from 'path'
 import { encryptAndSaveFile, decryptFile } from '../utils/encrypt'
-import stream from 'stream'
 
 /**
  *
@@ -187,15 +186,6 @@ class FileController {
           "Content-Length": fileDecryped.length
       });
       res.end(fileDecryped);
-
-      // res.download(location, file.name, err => {
-      //   if (err) {
-      //     throw new HttpException(500, err.message);
-      //   } else {
-      //     console.log(`File ${file.name} downloaded`);
-          
-      //   }
-      // })
     } catch (error) {
       return next(new HttpException(error.status || 500, error.message));
     }
