@@ -49,7 +49,6 @@ class FileRouter implements IRoute {
     // Save File
     this.router.post(this.pathAuthorParam,
       isDefinedParamMiddleware('params', 'author'),
-    (req, res, next) => getAuthUserMiddleware(req, next),
       upload.single('file'),
       (req: Request, res: Response, next: NextFunction) => FileControler
         .create(req, res, next),

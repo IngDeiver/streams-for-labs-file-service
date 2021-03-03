@@ -7,7 +7,7 @@ import { HttpException } from '../exceptions';
 import { FileService, PhotoService, VideoService } from '../services';
 import fs from 'fs'
 import path from 'path'
-
+import { encryptAndSaveFile, decryptFile } from '../utils/encrypt'
 
 /**
  *
@@ -106,23 +106,39 @@ class FileController {
     try {
       let file = req.file
       
-      console.log("File received in storage service: ",file);
-      console.log("File Storage in: ", file.path);
+      // create location to save
+      const mimetype = file.mimetype;
+      let folder = "files"
+      const USERNAME = req.body.username
+      const USER_FOLDER = `/home/streams-for-lab.co/${USERNAME?.toLowerCase().trim().replace(/ /g,'-')}`
       
-      //const author = req.user._id
+      if(mimetype.includes("image")) folder = "photos"
+      else if(mimetype.includes("video")) folder = "videos"
+      const destination = `${USER_FOLDER}/${folder}/${file.originalname}`
+
+      console.log("File received in storage service: ",file);
+      console.log("File Storage in: ", destination);
+      
+      // properties
       const author = req.params.author
-      const path = file.path
+      const path = destination
       const weight = file.size
       const upload_at = new Date()
       const name = file.originalname
 
-      if(file.mimetype.includes("image")){ // Save image
+      // Encrypt and save file
+      await  encryptAndSaveFile(file.buffer, path)
+      //await decryptFile(path)
+      
+      
+
+      if(mimetype.includes("image")){ // Save image
         const photoInstance:IPhoto = new Photo({name, path, weight, upload_at, author, shared_users:[]});
         const photoSaved: IPhoto = await PhotoService.create(photoInstance);
         console.log("Image saved");
         res.json(photoSaved)
 
-      }else if(file.mimetype.includes("video")){// Save video
+      }else if(mimetype.includes("video")){// Save video
         const videoInstance:IVideo = new Video({name, path, weight, upload_at, author, shared_users:[]});
         const videoSaved: IVideo = await VideoService.create(videoInstance);
         console.log("Video saved");
@@ -136,7 +152,7 @@ class FileController {
       }
 
     } catch (error) {
-      console.log(error);
+      console.log("File saved error:", error);
       
       return next(new HttpException(error.status || 500, error.message));
     }
