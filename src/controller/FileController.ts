@@ -8,6 +8,8 @@ import { FileService, PhotoService, VideoService } from '../services';
 import fs from 'fs'
 import path from 'path'
 import { encryptAndSaveFile, decryptFile } from '../utils/encrypt'
+const mkdirp = require('mkdirp')
+
 
 /**
  *
@@ -32,6 +34,23 @@ class FileController {
       const author = req.params.author
       const Files: Array<IFile> = await FileService.getFiles(author);
       res.json(Files);
+    } catch (error) {
+      return next(new HttpException(error.status || 500, error.message));
+    }
+  }
+
+
+  public static async mkdir(req: Request, res: Response, next: NextFunction) {
+    try {
+      const username = req.params.author
+      const USER_FOLDER = `/home/streams-for-lab.co/${username?.toLowerCase().trim().replace(/ /g,'-')}`
+      const FOLDER_OPTIONS ={mode: '700'}
+      mkdirp.sync(`${USER_FOLDER}`, FOLDER_OPTIONS)
+      mkdirp.sync(`${USER_FOLDER}/videos`, FOLDER_OPTIONS)
+      mkdirp.sync(`${USER_FOLDER}/photos`, FOLDER_OPTIONS)
+      mkdirp.sync(`${USER_FOLDER}/files`, FOLDER_OPTIONS)
+      console.log(`Directories to ${username} was created`);
+      res.sendStatus(200);
     } catch (error) {
       return next(new HttpException(error.status || 500, error.message));
     }

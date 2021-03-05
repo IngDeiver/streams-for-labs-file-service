@@ -32,6 +32,11 @@ class FileRouter implements IRoute {
       (req: Request, res: Response, next: NextFunction) => FileControler.getStorageByUser(req, res, next),
     );
     
+    // Create dirs to user
+    this.router.get(
+      `/mkdir${this.pathAuthorParam}`,
+      (req: Request, res: Response, next: NextFunction) => FileControler.mkdir(req, res, next),
+    );
     
      // Get max storage
      this.router.get(
