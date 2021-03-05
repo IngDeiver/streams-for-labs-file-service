@@ -180,13 +180,10 @@ class FileController {
       console.log("Location:", location);
 
       const fileDecryped = await decryptFile(location)
-      res.writeHead(200, {
-          "Content-disposition": "attachment; filename=" + file.name,
-          "Content-Type": "application/octet-stream",
-          "Content-Length": fileDecryped.length
-      });
-      res.end(fileDecryped);
+      res.json({file: fileDecryped.toString("base64"), name: file.name});
     } catch (error) {
+      console.log(error);
+      
       return next(new HttpException(error.status || 500, error.message));
     }
   }
