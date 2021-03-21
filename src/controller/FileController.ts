@@ -34,13 +34,37 @@ class FileController {
       const author = req.params.author
       const ownFiles: Array<IFile> = await FileService.getFiles(author);
       const sharedFiles: Array<IFile> = await FileService.getShareFiles(author);
-      
+
       res.json([...ownFiles, ...sharedFiles]);
     } catch (error) {
       return next(new HttpException(error.status || 500, error.message));
     }
   }
 
+    /**
+   *
+   * Share File
+   * @static
+   * @param {Request} req - The request
+   * @param {Response} res - The response
+   * @param {NextFunction} next - The next middleware in queue
+   * @return {Number} - A status request
+   * @memberof FileController
+   */
+     public static async shareFileWithUser(req: Request, res: Response, next: NextFunction) {
+      try {
+        const {fileId, userToShareId} = req.body
+        const { author} = req.params
+        const fileShared: IFile | null = await  FileService.shareFileWithUser(userToShareId, fileId)
+        
+        if (!fileShared) throw new HttpException(404, 'File not found');
+        if (author != fileShared?.author) throw new HttpException(403, 'Forbidden');
+        
+        res.sendStatus(200);
+      } catch (error) {
+        return next(new HttpException(error.status || 500, error.message));
+      }
+    }
 
     /**
    *

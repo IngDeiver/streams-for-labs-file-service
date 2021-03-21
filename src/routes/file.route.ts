@@ -65,6 +65,13 @@ class FileRouter implements IRoute {
         .create(req, res, next),
     );
 
+    // Share File
+    this.router.post(`/share${this.pathAuthorParam}`,
+      isDefinedParamMiddleware('params', 'author'),
+      (req: Request, res: Response, next: NextFunction) => FileControler
+        .shareFileWithUser(req, res, next),
+    );
+
     // Get File
     this.router.get(
       `${this.pathIdParam}${this.pathAuthorParam}`,

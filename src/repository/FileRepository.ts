@@ -118,6 +118,16 @@ class FileRepository implements ICrud<IFile, string> {
    /**
    *
    *
+   * @return {Promise<IFile>} Share file with a user
+   * @memberof FileRepository
+   */
+    async shareFileWithUser(userToShare: string, _id: String): Promise<IFile | null> {
+      return File.findByIdAndUpdate(_id, { $addToSet: { shared_users: new mongoose.Types.ObjectId(userToShare)} })
+    }
+
+   /**
+   *
+   *
    * @return {Promise<Array<IFile>>} List of shared files
    * @memberof FileRepository
    */

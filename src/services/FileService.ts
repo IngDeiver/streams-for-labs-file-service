@@ -101,6 +101,16 @@ class FileService implements ICrud<IFile, string> {
   async getShareFiles(author: string): Promise<Array<IFile>> {
     return FileRepository.getSharedFiles(author);
   }
+
+  /**
+   *
+   *
+   * @return {Promise<IFile>} Share file with a user
+   * @memberof FileService
+   */
+    async shareFileWithUser(userToShare: string, _id: String): Promise<IFile | null> {
+      return FileRepository.shareFileWithUser(userToShare, _id)
+    }
 }
 
 export default new FileService();
