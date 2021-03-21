@@ -3,7 +3,7 @@
 /* eslint-disable class-methods-use-this */
 import { ICrud, IVideo } from '../interfaces';
 import { Video } from '../models';
-
+import mongoose from 'mongoose'
 /**
  *
  * The Video repository 
@@ -111,7 +111,7 @@ class VideoRepository implements ICrud<IVideo, string> {
    * @memberof VideoRepository
    */
   async getSharedVideos(user: string): Promise<Array<IVideo>> {
-    return Video.find({ shared_users: user }).populate('author');
+    return Video.find({ shared_users: new mongoose.Types.ObjectId(user) }).populate('author');
   }
 
   /**

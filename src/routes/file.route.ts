@@ -45,6 +45,12 @@ class FileRouter implements IRoute {
       (req: Request, res: Response, next: NextFunction) => FileControler.getMaxStorage(req, res, next),
     );
 
+    // list all shared files
+    this.router.get(`/shared${this.pathAuthorParam}`,
+    isDefinedParamMiddleware('params', 'author'),
+    (req: Request, res: Response, next: NextFunction) => FileControler
+      .listAllSharedFIles(req, res, next));
+
     // list Files
     this.router.get(`${this.pathAuthorParam}`,
     isDefinedParamMiddleware('params', 'author'),

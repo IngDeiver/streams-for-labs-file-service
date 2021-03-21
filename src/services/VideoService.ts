@@ -97,6 +97,10 @@ class VideoService implements ICrud<IVideo, string> {
   async getVideos(author: string): Promise<Array<IVideo>> {
     return VideoRepository.getVideos(author);
   }
+
+  async getShareVideos(author: string): Promise<Array<IVideo>> {
+    return VideoRepository.getSharedVideos(author);
+  }
 }
 
 export default new VideoService();

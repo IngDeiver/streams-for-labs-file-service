@@ -3,6 +3,7 @@
 /* eslint-disable class-methods-use-this */
 import { ICrud, IPhoto } from '../interfaces';
 import { Photo } from '../models';
+import mongoose from 'mongoose'
 
 /**
  *
@@ -111,7 +112,7 @@ class PhotoRepository implements ICrud<IPhoto, string> {
    * @memberof PhotoRepository
    */
   async getSharedPhotos(user: string): Promise<Array<IPhoto>> {
-    return Photo.find({ shared_users: user }).populate('author');
+    return Photo.find({ shared_users: new mongoose.Types.ObjectId(user)  }).populate('author');
   }
 
   /**

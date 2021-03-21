@@ -3,6 +3,7 @@
 /* eslint-disable class-methods-use-this */
 import { ICrud, IFile } from '../interfaces';
 import { File } from '../models';
+import mongoose from 'mongoose'
 
 /**
  *
@@ -111,7 +112,7 @@ class FileRepository implements ICrud<IFile, string> {
    * @memberof FileRepository
    */
   async getSharedFiles(user: string): Promise<Array<IFile>> {
-    return File.find({ shared_users: user }).populate('author');
+    return File.find({ shared_users: new mongoose.Types.ObjectId(user) }).populate('author');
   }
 
    /**

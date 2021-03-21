@@ -32,13 +32,39 @@ class FileController {
   public static async list(req: Request, res: Response, next: NextFunction) {
     try {
       const author = req.params.author
-      const Files: Array<IFile> = await FileService.getFiles(author);
-      res.json(Files);
+      const ownFiles: Array<IFile> = await FileService.getFiles(author);
+      const sharedFiles: Array<IFile> = await FileService.getShareFiles(author);
+      
+      res.json([...ownFiles, ...sharedFiles]);
     } catch (error) {
       return next(new HttpException(error.status || 500, error.message));
     }
   }
 
+
+    /**
+   *
+   * List all Files shared
+   * @static
+   * @param {Request} req - The request
+   * @param {Response} res - The response
+   * @param {NextFunction} next - The next middleware in queue
+   * @return {JSON} - A list of Files shared
+   * @memberof FileController
+   */
+     public static async listAllSharedFIles(req: Request, res: Response, next: NextFunction) {
+      try {
+        const author = req.params.author
+        const files: Array<IFile> = await FileService.getShareFiles(author);
+        const videos: Array<IVideo> = await VideoService.getShareVideos(author);
+        const photos: Array<IPhoto> = await PhotoService.getSharePhotos(author);
+
+        const allFiles = [...files, ...videos, ...photos]
+        res.json(allFiles)
+      } catch (error) {
+        return next(new HttpException(error.status || 500, error.message));
+      }
+    }
 
   public static async mkdir(req: Request, res: Response, next: NextFunction) {
     try {
@@ -52,6 +78,8 @@ class FileController {
       console.log(`Directories to ${username} was created`);
       res.sendStatus(200);
     } catch (error) {
+      console.log(error);
+      
       return next(new HttpException(error.status || 500, error.message));
     }
   }
