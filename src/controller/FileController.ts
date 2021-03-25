@@ -199,8 +199,6 @@ class FileController {
 
       // Encrypt and save file
       await  encryptAndSaveFile(file.buffer, path)
-      //await decryptFile(path)
-      
       
 
       if(mimetype.includes("image")){ // Save image
