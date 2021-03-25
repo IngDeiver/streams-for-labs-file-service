@@ -12,7 +12,10 @@ export const queryVault = (uri: string) => {
     }
   
     axios.get(`${process.env.VAULT_HOST}${uri}`, options)
-    .then((res:AxiosResponse) => resolve(res.data))
+    .then((res:AxiosResponse) => {
+      console.log("Vault data: ", res.data);
+      return resolve(res.data.data)
+    })
     .catch((err: any) => reject(err))
   })
 }
