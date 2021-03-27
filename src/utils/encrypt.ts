@@ -7,7 +7,6 @@ console.log("AES_VAULT_URI: ", AES_VAULT_URI);
 const ALGORITHM = 'aes-256-cbc'
 
 export const encryptAndSaveFile = async (file: Buffer, path: string) => {
-    console.log("File to encrypt: ", file);
     const  keys: any  = await queryVault(AES_VAULT_URI)
     
     let cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(keys.key,"base64"), Buffer.from(keys.iv, "base64"));
@@ -16,6 +15,24 @@ export const encryptAndSaveFile = async (file: Buffer, path: string) => {
     fs.writeFileSync(path, encrypted)
     return encrypted
 
+}
+
+export const encryptAndSaveVideo = async (file: Buffer, path: string) => {
+
+    const  keys: any  = await queryVault(AES_VAULT_URI)
+    
+    let cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(keys.key,"base64"), Buffer.from(keys.iv, "base64"));
+    
+    let encrypted = '';
+
+    cipher.on('data', (chunk) => encrypted += chunk);
+    cipher.on('end', () => console.log("Video cifrado: ", encrypted));
+
+    await cipher.write(file);
+    await cipher.end();
+
+    fs.writeFileSync(path, encrypted)
+    return encrypted
 }
 
 export const decryptFile = async (path: string) => {

@@ -7,7 +7,7 @@ import { HttpException } from '../exceptions';
 import { FileService, PhotoService, VideoService } from '../services';
 import fs from 'fs'
 import path from 'path'
-import { encryptAndSaveFile, decryptFile } from '../utils/encrypt'
+import { encryptAndSaveFile, encryptAndSaveVideo, decryptFile } from '../utils/encrypt'
 const mkdirp = require('mkdirp')
 
 
@@ -197,8 +197,8 @@ class FileController {
       const upload_at = new Date()
       const name = file.originalname
 
-      // Encrypt and save file
       await  encryptAndSaveFile(file.buffer, path)
+     
       
 
       if(mimetype.includes("image")){ // Save image
