@@ -243,13 +243,17 @@ class FileController {
       const file: IFile | null = await FileService.getById(id);
 
       if (!file) throw new HttpException(404, 'File not found');
-      if( author != file.author) throw new HttpException(403, 'Forbidden: The file is not his authorship.');
+      if( author === file.author || file.shared_users.includes(author)) {
+        const location = file.path
+        console.log("Location:", location);
+  
+        const fileDecryped = await decryptFile(location)
+        res.json({file: fileDecryped.toString("base64"), name: file.name});
+        
+      }else {
+        throw new HttpException(403, 'Forbidden: The file is not his authorship.');
+      }
 
-      const location = file.path
-      console.log("Location:", location);
-
-      const fileDecryped = await decryptFile(location)
-      res.json({file: fileDecryped.toString("base64"), name: file.name});
     } catch (error) {
       console.log(error);
       
