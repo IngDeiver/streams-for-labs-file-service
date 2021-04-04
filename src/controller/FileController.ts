@@ -33,9 +33,11 @@ class FileController {
     try {
       const author = req.params.author
       const ownFiles: Array<IFile> = await FileService.getFiles(author);
-      const sharedFiles: Array<IFile> = await FileService.getShareFiles(author);
+      const videos: Array<IVideo> = await VideoService.getVideos(author);
+      const photos: Array<IPhoto> = await PhotoService.getPhotos(author);
 
-      res.json([...ownFiles, ...sharedFiles]);
+      const allFiles = [...videos, ...photos,...ownFiles]
+      res.json(allFiles)
     } catch (error) {
       return next(new HttpException(error.status || 500, error.message));
     }
@@ -180,11 +182,19 @@ class FileController {
       // create location to save
       const mimetype = file.mimetype;
       let folder = "files"
+      let type = "file"
       const USERNAME = req.body.username
       const USER_FOLDER = `/home/streams-for-lab.co/${USERNAME?.toLowerCase().trim().replace(/ /g,'-')}`
       
-      if(mimetype.includes("image")) folder = "photos"
-      else if(mimetype.includes("video")) folder = "videos"
+      if(mimetype.includes("image")) {
+        folder = "photos"
+        type = "photo"
+      }
+      else if(mimetype.includes("video")) {
+        folder = "videos"
+        type = "video"
+      }
+
       const destination = `${USER_FOLDER}/${folder}/${file.originalname}`
 
       console.log("File received in storage service: ",file);
@@ -202,19 +212,19 @@ class FileController {
       
 
       if(mimetype.includes("image")){ // Save image
-        const photoInstance:IPhoto = new Photo({name, path, weight, upload_at, author, shared_users:[]});
+        const photoInstance:IPhoto = new Photo({name, path, weight, upload_at, author, shared_users:[], type});
         const photoSaved: IPhoto = await PhotoService.create(photoInstance);
         console.log("Image saved");
         res.json(photoSaved)
 
       }else if(mimetype.includes("video")){// Save video
-        const videoInstance:IVideo = new Video({name, path, weight, upload_at, author, shared_users:[]});
+        const videoInstance:IVideo = new Video({name, path, weight, upload_at, author, shared_users:[], type});
         const videoSaved: IVideo = await VideoService.create(videoInstance);
         console.log("Video saved");
         res.json(videoSaved);
 
       }else {// Save file
-        const fileInstance:IFile = new File({name, path, weight, upload_at, author, shared_users:[]});
+        const fileInstance:IFile = new File({name, path, weight, upload_at, author, shared_users:[], type});
         const fileSaved: IFile = await FileService.create(fileInstance);
         console.log("File saved");
         res.json(fileSaved);
@@ -234,7 +244,7 @@ class FileController {
    * @param {Request} req - The request
    * @param {Response} res - The response
    * @param {NextFunction} next - The next middleware in queue
-   * @return {JSON} - A list of Files
+   * @return {JSON} - A File
    * @memberof FileController
    */
   public static async download(req: any, res: Response, next: NextFunction) {
