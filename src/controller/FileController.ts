@@ -250,10 +250,13 @@ class FileController {
   public static async download(req: any, res: Response, next: NextFunction) {
     try {
       const { id, author } = req.params;
+      console.log("Auhthor: ", author);
+      
       const file: IFile | null = await FileService.getById(id);
-
+     
       if (!file) throw new HttpException(404, 'File not found');
-      if( author === file.author || file.shared_users.includes(author)) {
+      console.log("File auhthor: ", file.author);
+      if( author == file.author || file.shared_users.includes(author)) {
         const location = file.path
         console.log("Location:", location);
   
