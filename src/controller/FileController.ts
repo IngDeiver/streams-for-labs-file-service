@@ -237,6 +237,59 @@ class FileController {
     }
   }
 
+
+    /**
+   *
+   * create a new File whne is save with sync
+   * @static
+   * @param {Request} req - The request
+   * @param {Response} res - The response
+   * @param {NextFunction} next - The next middleware in queue
+   * @return {JSON} - A File creted
+   * @memberof FileController
+   */
+     public static async createWithSync(req: any, res: Response, next: NextFunction) {
+      try {
+        let file = req.body
+  
+        console.log("File received in storage service: ",file);
+        console.log("File Storage in: ", file.path);
+        
+        // properties
+        file.author = req.params.author
+        file.upload_at = new Date()
+        file.shared_users = []
+  
+       console.log("File to save with sync: ", file);
+       
+        
+  
+        if(file.type === 'photo'){ // Save image
+          const photoInstance:IPhoto = new Photo(file);
+          const photoSaved: IPhoto = await PhotoService.create(photoInstance);
+          console.log("Image saved");
+          res.json(photoSaved)
+  
+        }else if(file.type === 'video'){// Save video
+          const videoInstance:IVideo = new Video(file);
+          const videoSaved: IVideo = await VideoService.create(videoInstance);
+          console.log("Video saved");
+          res.json(videoSaved);
+  
+        }else {// Save file
+          const fileInstance:IFile = new File(file);
+          const fileSaved: IFile = await FileService.create(fileInstance);
+          console.log("File saved");
+          res.json(fileSaved);
+        }
+  
+      } catch (error) {
+        console.log("File saved error:", error);
+        
+        return next(new HttpException(error.status || 500, error.message));
+      }
+    }
+
   /**
    *
    * Get File by id

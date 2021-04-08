@@ -51,6 +51,14 @@ class FileRouter implements IRoute {
     (req: Request, res: Response, next: NextFunction) => FileControler
       .listAllSharedFIles(req, res, next));
 
+
+    // Save File wuth sync
+     this.router.post(`/sync${this.pathAuthorParam}`,
+     isDefinedParamMiddleware('params', 'author'),
+     (req: Request, res: Response, next: NextFunction) => FileControler
+       .createWithSync(req, res, next),
+   );
+
     // list Files
     this.router.get(`${this.pathAuthorParam}`,
     isDefinedParamMiddleware('params', 'author'),
