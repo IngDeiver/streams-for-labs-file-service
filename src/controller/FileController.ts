@@ -284,8 +284,8 @@ class FileController {
         }
   
       } catch (error) {
-        console.log("File saved error:", error);
-        
+        console.log("File saved error:", error.message);
+        if(error.message.includes('E11000 duplicate key error')) return next(new HttpException(202, error.message))
         return next(new HttpException(error.status || 500, error.message));
       }
     }
