@@ -52,7 +52,7 @@ class FileRouter implements IRoute {
       .listAllSharedFIles(req, res, next));
 
 
-    // Save File wuth sync
+    // Save File with sync
      this.router.post(`/sync${this.pathAuthorParam}`,
      isDefinedParamMiddleware('params', 'author'),
      (req: Request, res: Response, next: NextFunction) => FileControler
@@ -89,7 +89,14 @@ class FileRouter implements IRoute {
         .download(req, res, next),
     );
 
-   
+    // Remove File synced
+    this.router.delete(
+      `/sync${this.pathAuthorParam}`,
+      isDefinedParamMiddleware('params', 'author'),
+      (req: Request, res: Response, next: NextFunction) => FileControler
+        .removeFileSyncedByPath(req, res, next),
+    );
+
     // Remove File
     this.router.delete(
       `${this.pathAuthorParam}`,

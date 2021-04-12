@@ -329,6 +329,36 @@ class FileController {
 
   /**
    *
+   * Remove File synced by id 
+   * @static
+   * @param {Request} req - The request
+   * @param {Response} res - The response
+   * @param {NextFunction} next - The next middleware in queue
+   * @return {JSON} - A list of FileS
+   * @memberof FileController
+   */
+   public static async removeFileSyncedByPath(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {author } = req.params;
+      const { pathToRemove } = req.body
+      console.log("Path received: ", pathToRemove);
+      
+        const file: IFile | null = await FileService.removeByPath(pathToRemove);
+        if (!file) throw new HttpException(404, 'File not found');
+        if( author != file.author) throw new HttpException(403, 'Forbidden: The file is not his authorship.');
+      
+        fs.unlinkSync(path.resolve(pathToRemove))
+        console.log(`File ${file.name} deleted`);
+      res.sendStatus(200)
+    } catch (error) {
+      console.log(error);
+      return next(new HttpException(error.status || 500, error.message));
+    }
+  }
+
+
+  /**
+   *
    * Remove File by id
    * @static
    * @param {Request} req - The request

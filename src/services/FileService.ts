@@ -43,6 +43,19 @@ class FileService implements ICrud<IFile, string> {
     return FileRepository.getById(id);
   }
 
+
+  /**
+   *
+   * Find by path a File
+   * @param {string} path - The path to find
+   * @return {Promise<IFile>}  A File
+   * @memberof FileService
+   */
+   async getByPath(path: string): Promise<IFile| null> {
+    return FileRepository.getByPath(path);
+  }
+
+
   /**
    *
    * Remove a File
@@ -66,6 +79,19 @@ class FileService implements ICrud<IFile, string> {
     if (taskToDelete) await taskToDelete.remove();
     return taskToDelete;
   }
+
+   /**
+   *
+   * Remove by path a File synced
+   * @param {string} path - The path to find
+   * @return {Promise<IFile>}  A File removed
+   * @memberof FileService
+   */
+    async removeByPath(path: string): Promise<IFile| null> {
+      const taskToDelete = await this.getByPath(path);
+      if (taskToDelete) await taskToDelete.remove();
+      return taskToDelete;
+    }
 
   /**
    *

@@ -37,13 +37,25 @@ class FileRepository implements ICrud<IFile, string> {
   /**
    *
    *
+   * @param {string} path - The path to find
+   * @return {Promise<IFile>}  A File
+   * @memberof FileRepository
+   */
+  async getByPath(path: string): Promise<IFile | null> {
+    return File.findOne({ path });
+  }
+
+  /**
+   *
+   *
    * @param {string} id - The id to find
    * @return {Promise<IFile>}  A File
    * @memberof FileRepository
    */
-  async getById(id: string): Promise<IFile | null> {
+   async getById(id: string): Promise<IFile | null> {
     return File.findById(id);
   }
+
 
   /**
    *
