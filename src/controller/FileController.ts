@@ -346,8 +346,6 @@ class FileController {
         const file: IFile | null = await FileService.removeByPath(pathToRemove);
         if (!file) throw new HttpException(404, 'File not found');
         if( author != file.author) throw new HttpException(403, 'Forbidden: The file is not his authorship.');
-      
-        fs.unlinkSync(path.resolve(pathToRemove))
         console.log(`File ${file.name} deleted`);
       res.sendStatus(200)
     } catch (error) {
